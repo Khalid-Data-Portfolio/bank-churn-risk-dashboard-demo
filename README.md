@@ -2,7 +2,7 @@
 
 This is the public client demo version of the Bank Customer Churn Risk Dashboard.
 
-The dashboard displays prepared demo data, risk indicators, customer churn charts, high-risk customer tables, and downloadable demo reports. The import/upload feature is intentionally disabled in this public preview so visitors can inspect the dashboard experience without running private data through the model.
+The dashboard displays prepared demo data, risk indicators, customer churn charts, high-risk customer tables, and a demo PDF preview. The import/upload feature is intentionally disabled in this public preview so visitors can inspect the dashboard experience without running private data through the model.
 
 ## Live Demo
 
@@ -20,31 +20,11 @@ https://bank-churn-dashboard-demo.streamlit.app/
 - Average risk by activity status
 - Average risk by number of products
 - High-risk customer table
-- Demo Excel/PDF/CSV export
+- Demo PDF report preview
 
 ## What Is Disabled
 
-The file import button is shown as a locked demo control. Visitors cannot upload their own CSV or Excel data in this public version.
-
-## Run Locally
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Run Streamlit:
-
-```bash
-streamlit run app.py
-```
-
-Open:
-
-```text
-http://localhost:8501
-```
+The file import button is shown as a locked demo control. Visitors cannot upload their own CSV or Excel data in this public version, and external scoring is not available.
 
 ## Note
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from io import BytesIO
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -197,35 +196,6 @@ def load_demo_data() -> pd.DataFrame:
     return df
 
 
-def build_csv(scored: pd.DataFrame) -> bytes:
-    return scored.to_csv(index=False).encode("utf-8")
-
-
-def build_excel(scored: pd.DataFrame) -> bytes:
-    summary = pd.DataFrame(
-        [
-            {"Metric": "Total customers", "Value": len(scored)},
-            {"Metric": "Predicted churn customers", "Value": int(scored["predicted_exited"].sum())},
-            {"Metric": "High risk customers", "Value": int((scored["risk_level"] == "High").sum())},
-            {"Metric": "Average churn probability", "Value": f"{scored['churn_probability'].mean():.2%}"},
-        ]
-    )
-    high_risk = scored.sort_values("churn_probability", ascending=False).head(50)
-    risk_by_geography = (
-        scored.groupby("Geography")
-        .agg(customers=("risk_level", "size"), average_churn_probability=("churn_probability", "mean"))
-        .reset_index()
-        .sort_values("average_churn_probability", ascending=False)
-    )
-    buffer = BytesIO()
-    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-        scored.to_excel(writer, sheet_name="Demo Predictions", index=False)
-        summary.to_excel(writer, sheet_name="Dashboard Summary", index=False)
-        high_risk.to_excel(writer, sheet_name="High Risk Customers", index=False)
-        risk_by_geography.to_excel(writer, sheet_name="Risk by Geography", index=False)
-    return buffer.getvalue()
-
-
 def render_dashboard(scored: pd.DataFrame) -> None:
     high_risk_count = int((scored["risk_level"] == "High").sum())
     predicted_churn = int(scored["predicted_exited"].sum())
@@ -335,29 +305,16 @@ def main() -> None:
             """,
             unsafe_allow_html=True,
         )
-        st.info("This preview uses built-in demo data. Private data upload is available only in the full client deployment.")
+        st.info("This preview uses built-in demo data. Data upload and external scoring are disabled in the public portfolio app.")
 
     render_dashboard(scored)
 
-    section_title("Export Demo Reports")
-    export_col1, export_col2, export_col3 = st.columns(3)
-    export_col1.download_button(
-        "Download Demo Excel",
-        data=build_excel(scored),
-        file_name="demo_bank_churn_dashboard.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
-    export_col2.download_button(
-        "Download Demo PDF",
+    section_title("Report Preview")
+    st.download_button(
+        "Download Demo PDF Preview",
         data=PREVIEW_PDF_PATH.read_bytes(),
         file_name="demo_bank_churn_dashboard.pdf",
         mime="application/pdf",
-    )
-    export_col3.download_button(
-        "Download Demo CSV",
-        data=build_csv(scored),
-        file_name="demo_bank_churn_predictions.csv",
-        mime="text/csv",
     )
 
 
